@@ -12,3 +12,69 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  lastname  String
+  address   String
+  phone     String
+  birthdate DateTime
+  username  String    @unique
+  email     String    @unique
+  password  String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+
+  posts     Post[]
+  comments  Comment[]
+  ratings   Rating[]
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  image       String?
+  status      String    @default("Perdid@") // Perdid@, Encontrad@, Caso Resuelto
+  location    Json
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  comments    Comment[]
+  Rating Rating[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  postId    Int
+  userId    Int
+
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  stars     Int      @default(0) // Calificación de 0 a 5
+
+  createdAt DateTime @default(now())
+
+
+  userId    Int
+  postId    Int
+
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+}
